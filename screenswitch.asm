@@ -61,9 +61,10 @@ tajmat:
 		sta $d019
 
 ddoo:
-	//	lda #%00000011
-    //$DD00 = %xxxxxx01 -> bank2: $8000-$bfff
-        lda #%00000001
+ //       .byte %00000011
+   // .byte %00000010
+   // .byte %00000001
+        lda #%00000011
 		sta $dd00
 
 		lda #$06
@@ -75,9 +76,10 @@ ddoo:
 		sta $d016
 
 do18:	
-//$D018 = %0000xxxx -> screenmem is at $0000
-//$18 / 2000
-		lda #%00001000
+    // .byte %00011000
+    // .byte %00001000
+    // .byte %00001000
+		lda #%00011000
 		sta $d018
 		lda #$00
 		sta $d015
@@ -114,10 +116,10 @@ irq2:
 		lda #$00
 		sta $d020
 
-		lda #$14
-		sta $d018
-		lda #$08
-		sta $d016
+		// lda #$14
+		// sta $d018
+		// lda #$08
+		// sta $d016
 
         inc $d020
         jsr bankswitcher
@@ -248,49 +250,58 @@ init:
 
         ldx #$00
 set0400:
-        lda $3f40,x
+        lda $4400,x
         sta $0400,x
-        lda $4040,x
+        lda $4500,x
         sta $0500,x
-        lda $4140,x
+        lda $4600,x
         sta $0600,x
-        lda $4240,x
+        lda $4700,x
         sta $0700,x
         inx
         bne set0400 
 
 //TODO : load directly add address
-set4000:
-        lda $7f40,x
-        sta $4000,x
-        lda $8040,x
-        sta $4100,x
-        lda $8140,x
-        sta $4200,x
-        lda $8240,x
-        sta $4300,x
-        inx
-        bne set4000 
+// set4000:
+//         lda $7f40,x
+//         sta $4000,x
+//         lda $8040,x
+//         sta $4100,x
+//         lda $8140,x
+//         sta $4200,x
+//         lda $8240,x
+//         sta $4300,x
+//         inx
+//         bne set4000 
 
-set8000:
-        lda $bf40,x
-        sta $8000,x
-        lda $c040,x
-        sta $8100,x
-        lda $c140,x
-        sta $8200,x
-        lda $c240,x
-        sta $8300,x
-        inx
-        bne set8000 
+// set8000:
+//         lda $bf40,x
+//         sta $8000,x
+//         lda $c040,x
+//         sta $8100,x
+//         lda $c140,x
+//         sta $8200,x
+//         lda $c240,x
+//         sta $8300,x
+//         inx
+//         bne set8000 
         rts
 
-.pc = $2000 "Picture 1"
-.import c64 "love1.prg"
+.pc = $2000 "Picture 1 Chars"
+.import c64 "love1char.prg"
 
-.pc = $6000 "Picture 2"
-.import c64 "love2.prg"
+.pc = $4400 "Picture 1 Screen"
+.import c64 "love1screen.prg"
 
-.pc = $a000 "Picture 3"
-.import c64 "love3.prg"
+.pc = $4000 "Picture 2 Screen"
+.import c64 "love2screen.prg"
+
+.pc = $6000 "Picture 2 Chars"
+.import c64 "love2char.prg"
+
+.pc = $8000 "Picture 3 Screen"
+.import c64 "love3screen.prg"
+
+.pc = $a000 "Picture 3 Chars"
+.import c64 "love3char.prg"
 
