@@ -61,7 +61,9 @@ tajmat:
 		sta $d019
 
 ddoo:
-		lda #%00000011
+	//	lda #%00000011
+    //$DD00 = %xxxxxx01 -> bank2: $8000-$bfff
+        lda #%00000001
 		sta $dd00
 
 		lda #$06
@@ -73,7 +75,9 @@ ddoo:
 		sta $d016
 
 do18:	
-		lda #$18
+//$D018 = %0000xxxx -> screenmem is at $0000
+//$18 / 2000
+		lda #%00001000
 		sta $d018
 		lda #$00
 		sta $d015
@@ -116,7 +120,7 @@ irq2:
 		sta $d016
 
         inc $d020
-   //     jsr bankswitcher
+        jsr bankswitcher
         dec $d020
 
 		lda #$02
@@ -254,18 +258,39 @@ set0400:
         sta $0700,x
         inx
         bne set0400 
+
+//TODO : load directly add address
+set4000:
+        lda $7f40,x
+        sta $4000,x
+        lda $8040,x
+        sta $4100,x
+        lda $8140,x
+        sta $4200,x
+        lda $8240,x
+        sta $4300,x
+        inx
+        bne set4000 
+
+set8000:
+        lda $bf40,x
+        sta $8000,x
+        lda $c040,x
+        sta $8100,x
+        lda $c140,x
+        sta $8200,x
+        lda $c240,x
+        sta $8300,x
+        inx
+        bne set8000 
         rts
 
-
-.pc = $1000 "Screenmem 1"
-screenmem1:
-.text "this is 0400"
-
-*=$2000 "Picture 1"
+.pc = $2000 "Picture 1"
 .import c64 "love1.prg"
 
-.pc = $8400 "Screenmem 3"
-.text "this is 8400. new new bank"
+.pc = $6000 "Picture 2"
+.import c64 "love2.prg"
 
-.pc = $c400 "Screenmem 2"
-.text "this is c400. new bank"
+.pc = $a000 "Picture 3"
+.import c64 "love3.prg"
+

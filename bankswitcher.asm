@@ -1,14 +1,15 @@
 .pc = $0f00 "Bank switcher"
+.var delayswitch = $11
 
 bankswitcher:
-    lda #$80
+    lda #$10
     beq switchbank
 
     dec bankswitcher + 1 
     rts
 
 switchbank:
-    lda #$81
+    lda #delayswitch
     sta bankswitcher + 1
 
 bankselect:
@@ -31,8 +32,11 @@ bankselect:
 
 bankValues:
     .byte %00000011
+    .byte %00000010
     .byte %00000001
-    .byte %00000000
 
 charValues:
-    .byte $14, $14, $18
+    //.byte $14, $14, $18
+    .byte %00011000
+    .byte %00001000
+    .byte %00001000
