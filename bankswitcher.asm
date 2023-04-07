@@ -1,4 +1,4 @@
-.pc = $4800 "Bank switcher"
+.pc = $0f00 "Bank switcher"
 
 bankswitcher:
     lda #$80
@@ -15,6 +15,8 @@ bankselect:
     ldx #$00
     lda bankValues,x
     sta ddoo + 1
+    lda charValues,x
+    sta do18 + 1
 
     inc bankselect + 1
     lda bankselect + 1
@@ -33,4 +35,4 @@ bankValues:
     .byte %00000000
 
 charValues:
-    .byte $14, $14, $14
+    .byte $14, $14, $18

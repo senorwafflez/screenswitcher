@@ -4,7 +4,7 @@
 .pc = $0801 "Program Start"
 :BasicUpstart($c000)
 
-.pc = $4000 "Main interrupt"
+.pc = $0900 "Main interrupt"
 
 		jsr init
 		sei
@@ -64,7 +64,7 @@ ddoo:
 		lda #%00000011
 		sta $dd00
 
-		lda #$00
+		lda #$06
 		sta $d021
 		lda #$00
 		sta $d020
@@ -73,11 +73,11 @@ ddoo:
 		sta $d016
 
 do18:	
-		lda #$14
+		lda #$18
 		sta $d018
 		lda #$00
 		sta $d015
-		lda #$1b
+		lda #$3b
 		sta $d011
 
 
@@ -116,7 +116,7 @@ irq2:
 		sta $d016
 
         inc $d020
-        jsr bankswitcher
+   //     jsr bankswitcher
         dec $d020
 
 		lda #$02
@@ -244,8 +244,14 @@ init:
 
         ldx #$00
 set0400:
-        lda screenmem1,x
+        lda $3f40,x
         sta $0400,x
+        lda $4040,x
+        sta $0500,x
+        lda $4140,x
+        sta $0600,x
+        lda $4240,x
+        sta $0700,x
         inx
         bne set0400 
         rts
@@ -254,6 +260,9 @@ set0400:
 .pc = $1000 "Screenmem 1"
 screenmem1:
 .text "this is 0400"
+
+*=$2000 "Picture 1"
+.import c64 "love1.prg"
 
 .pc = $8400 "Screenmem 3"
 .text "this is 8400. new new bank"
