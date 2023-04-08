@@ -1,8 +1,12 @@
+.var music = LoadSid("joy.sid")
+.pc = music.location "Music"
+.fill music.size, music.getData(i)
 
 .import source "bankswitcher.asm"
 
+
 .pc = $0801 "Program Start"
-:BasicUpstart($c000)
+:BasicUpstart($0900)
 
 .pc = $0900 "Main interrupt"
 
@@ -31,7 +35,7 @@
 		lda #$35
         sta $01
         lda #$00
-//        jsr music.init
+        jsr music.init
         cli
 
 iloop:	
@@ -69,6 +73,7 @@ ddoo:
 
 		lda #$06
 		sta $d021
+     
 		lda #$00
 		sta $d020
 
@@ -76,9 +81,6 @@ ddoo:
 		sta $d016
 
 do18:	
-    // .byte %00011000
-    // .byte %00001000
-    // .byte %00001000
 		lda #%00011000
 		sta $d018
 		lda #$00
@@ -86,9 +88,14 @@ do18:
 		lda #$3b
 		sta $d011
 
-
+bordercolor:
         lda #$06
         sta $d020
+
+        inc $d020
+        jsr music.play
+        dec $d020
+
 		lda #$ff
 		sta $d012
 		lda #<irq2
@@ -123,6 +130,7 @@ irq2:
 
         inc $d020
         jsr bankswitcher
+    //    jsr fadeout
         dec $d020
 
 		lda #$02
@@ -247,6 +255,9 @@ init:
 		lda #$00
 		sta $d020
 		sta $d021
+
+        lda #$00
+        sta bankselect + 1
 
         ldx #$00
 set0400:
