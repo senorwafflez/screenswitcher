@@ -5,7 +5,7 @@
 .import source "bankswitcher.asm"
 .import source "introtexter.asm"
 
-.var debug = false
+.var debug = true
 .var indicator = true
 
 .pc = $0801 "Program Start"
@@ -13,7 +13,7 @@
 
 .pc = $0900 "Main interrupt"
 
-		jsr graphicsinit
+		jsr introinit
 		sei
 		lda #$7f
 		sta $dc0d
@@ -272,9 +272,9 @@ introsplit1:
 
 		lda #$32
 		sta $d012
-		lda #<irq
+		lda #<introirq
 		sta $fffe
-		lda #>irq
+		lda #>introirq
 		sta $ffff
 
 		pla
@@ -377,7 +377,7 @@ stabilizer_raster_000:
 
 delay: .byte 1,1,1,1,$10,$10,1,1
 
-init:
+introinit:
 	lda #$36
 	sta $01
 	lda #$93
@@ -389,9 +389,15 @@ init:
 
         lda #$00
         sta bankselect + 1
+        sta linesdone
+
+        lda colorlinelobyte
+        sta introfadein + 1
+        lda colorlinehibyte
+        sta introfadein + 2
 
         ldx #$00
-        lda #$00
+        lda #$06
 setinitialcolor:
         sta $d800,x
         sta $d900,x
