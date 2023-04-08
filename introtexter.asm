@@ -42,10 +42,78 @@ stopfadein:
     lda #$60
     sta introtexter
     sta stopfadenext
+
+    lda #$ea
+    sta spaceroutine
     rts
 
 linesdone:
     .byte $00
+
+//------- PRESS SPACE ROUTINE ---------------
+
+.var spaceframedelay = $02
+
+spaceroutine:
+    rts
+
+spacecheckdelay:
+    lda #spaceframedelay
+    beq checkspace
+
+    dec spacecheckdelay + 1
+    rts
+
+checkspace:
+    lda #spaceframedelay
+    sta spacecheckdelay + 1
+
+    lda $dc01
+    cmp #$ef
+    beq spaceispressed
+    rts
+
+spaceispressed:
+    lda #$ea
+    sta setgraphicsinit
+    rts
+
+setgraphicsinit:
+    rts
+
+    lda #$60
+    sta setgraphicsinit
+    lda #$ea
+    sta setgraphicsinit2
+    
+    jsr graphicsinit
+
+    rts
+
+setgraphicsinit2:
+    rts
+
+    lda #$60
+    sta setgraphicsinit2
+    lda #$ea
+    sta switchinterrupttomain
+    
+    jsr graphicsinit2
+
+    rts
+
+
+switchinterrupttomain:
+    rts
+
+    lda #$60
+    sta switchinterrupttomain
+
+	lda #<irq
+	sta irq1_lo+1
+	lda #>irq
+	sta irq1_hi+1
+    rts
 
 .pc = $4e00 "Introfader colors"
 introfadercolors:

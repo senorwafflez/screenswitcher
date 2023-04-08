@@ -20,8 +20,10 @@
 		lda #$81
 		sta $d01a
 
+irqp1:
 		lda #<introirq
 		sta $fffe
+irqp2:
 		lda #>introirq
 		sta $ffff
 
@@ -43,12 +45,23 @@
 
 iloop:	
         lda #$00
-		beq wait
+	beq waittimer
 
-		lda #$00
-		sta iloop+1
+	lda #$00
+	sta iloop+1
 
-wait:
+        jsr setgraphicsinit2
+        jsr setgraphicsinit
+
+waittimer:	
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
 		jmp iloop
 
 nmi:
@@ -265,15 +278,21 @@ introsplit1:
                 }
 
                 jsr introtexter
+                jsr spaceroutine
+                jsr switchinterrupttomain
 
                 .if (debug) {
                         dec $d020
                 }
 
+                dec iloop + 1
+
 		lda #$32
 		sta $d012
+irq1_lo:                
 		lda #<introirq
 		sta $fffe
+irq1_hi:
 		lda #>introirq
 		sta $ffff
 
@@ -418,21 +437,37 @@ setinitialtext:
         sta $0700,x
         inx
         bne setinitialtext
+
+        lda #$60
+        sta setgraphicsinit
+        sta setgraphicsinit2
+        sta switchinterrupttomain
+        sta spaceroutine
         rts
+
 graphicsinit:
+        nop
         ldx #$00
 set0400:
         lda $4400,x
         sta $0400,x
         lda $4500,x
         sta $0500,x
+        inx
+        bne set0400 
+
+        rts
+
+graphicsinit2:
+        nop
+        ldx #$00
+set0400b:
         lda $4600,x
         sta $0600,x
         lda $4700,x
         sta $0700,x
         inx
-        bne set0400 
-
+        bne set0400b
         rts
 
 .pc = $4800 "Selector List"
