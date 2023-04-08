@@ -3,6 +3,8 @@
 .fill music.size, music.getData(i)
 
 .import source "bankswitcher.asm"
+.import source "introtexter.asm"
+
 .var debug = true
 .var indicator = true
 
@@ -18,9 +20,9 @@
 		lda #$81
 		sta $d01a
 
-		lda #<irq
+		lda #<introirq
 		sta $fffe
-		lda #>irq
+		lda #>introirq
 		sta $ffff
 
 		lda #<nmi
@@ -196,6 +198,91 @@ irq2:
 
 bordercolor:
         .byte $00
+//-------------------INTRO IRQ ----------
+introirq:	pha
+
+		jsr stabilize_raster
+
+		txa
+		pha
+		tya
+		pha
+
+		lda #$ff
+		sta $d019
+
+                lda #%00000011
+		sta $dd00
+
+                ldy #$05
+                dey
+                bne * - 1
+                nop
+
+		lda #$0e
+		sta $d020
+                nop
+                bit $ea
+
+                lda #$06
+		sta $d021
+
+		lda #$08
+		sta $d016
+
+		lda #$14
+		sta $d018
+		lda #$00
+		sta $d015
+		lda #$1b
+		sta $d011
+
+
+      //  lda #$06
+     //   sta $d020
+
+        .if (debug)
+        {
+                inc $d020
+        }
+
+        jsr music.play
+
+        .if (debug)
+        {
+                dec $d020
+        }
+
+introsplit1:
+                lda $d012
+                cmp #$f0
+                bne introsplit1
+
+                .if (debug) {
+                        lda #$02
+                        sta $d020
+                        inc $d020
+                }
+
+                jsr introtexter
+
+                .if (debug) {
+                        dec $d020
+                }
+
+		lda #$32
+		sta $d012
+		lda #<introirq
+		sta $fffe
+		lda #>introirq
+		sta $ffff
+
+		pla
+		tay
+		pla
+		tax
+		pla
+		rti
 //-------------------STABILIZE CODE -----
 
 stabilize_raster:      
@@ -295,10 +382,38 @@ init:
 	sta $01
 	lda #$93
 	jsr $ffd2
+        lda #$0e
+        sta $d020
+        lda #$06
+        sta $d021
 
         lda #$00
         sta bankselect + 1
 
+        ldx #$00
+        lda #$00
+setinitialcolor:
+        sta $d800,x
+        sta $d900,x
+        sta $da00,x
+        sta $db00,x
+        inx
+        bne setinitialcolor
+
+        ldx #$00
+setinitialtext:
+        lda introtext,x
+        sta $0400,x
+        lda introtext + $100,x
+        sta $0500,x
+        lda introtext + $200,x
+        sta $0600,x
+        lda introtext + $300,x
+        sta $0700,x
+        inx
+        bne setinitialtext
+        rts
+graphicsinit:
         ldx #$00
 set0400:
         lda $4400,x
@@ -352,6 +467,7 @@ selectorList:
 .import c64 "love3char.prg"
 
 .pc = $4900 "Introtext"
+introtext:
 .import c64 "triggerwarning2.prg"
 
 
