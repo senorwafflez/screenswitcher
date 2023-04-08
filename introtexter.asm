@@ -57,6 +57,12 @@ linesdone:
 spaceroutine:
     rts
 
+    lda $dc01
+    cmp #$ef
+    beq spacecheckdelay
+
+    jsr spaceisreleased
+
 spacecheckdelay:
     lda #spaceframedelay
     beq checkspace
@@ -71,20 +77,68 @@ checkspace:
     lda $dc01
     cmp #$ef
     beq spaceispressed
+
+    lda $dc01
+    cmp #$ef
+    bne spaceisnotpressed
+
+    rts
+
+setspacetextcolor:
+    ldx #$00
+getspacecols:
+    lda spacepressingcols
+setpresswhitespace:
+    sta $db20,x
+    inx
+    cpx #$14
+    bne setpresswhitespace
+    rts
+
+spaceisreleased:
+    rts
+    lda #$ea
+    sta setgraphicsinit
+    rts
+
+spaceisnotpressed:
+    nop
+    lda getspacecols + 1
+    cmp #$00
+    beq nolower
+    dec getspacecols + 1
+    jsr setspacetextcolor
+nolower:
     rts
 
 spaceispressed:
+    nop
+    jsr setspacetextcolor
+    
+    lda getspacecols + 1
+    cmp #$07
+    beq skipincgetspace
+    inc getspacecols + 1
+    jmp notreleasespace
+skipincgetspace:
+    ldx #$00
+    lda #$01
+whiterelease:
+    sta $db20 + $16,x
+    inx
+    cpx #$12
+    bne whiterelease
+    lda #$60
+    sta spaceisnotpressed
+    sta spaceispressed
     lda #$ea
-    sta setgraphicsinit
+    sta spaceisreleased
+notreleasespace:
     rts
+
 
 setgraphicsinit:
     rts
-
-    lda #$60
-    sta setgraphicsinit
-    lda #$ea
-    sta setgraphicsinit2
     
     jsr graphicsinit
 
@@ -139,3 +193,8 @@ colorlinehibyte:
 .byte $d9, $d9, $d9, $d9, $d9, $d9
 .byte $da, $da, $da, $da, $da, $da, $da
 .byte $db, $db, $db, $db, $db, $db
+
+.pc = $5000 "Spacepressing colors"
+spacepressingcols:
+.byte $0e, $0e, $0f, $0f, $01, $01, $01
+.fill $40, $01
