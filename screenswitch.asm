@@ -5,7 +5,7 @@
 .import source "bankswitcher.asm"
 .import source "introtexter.asm"
 
-.var debug = true
+.var debug = false
 .var indicator = true
 
 .pc = $0801 "Program Start"
@@ -13,7 +13,7 @@
 
 .pc = $0900 "Main interrupt"
 
-		jsr init
+		jsr graphicsinit
 		sei
 		lda #$7f
 		sta $dc0d
@@ -272,9 +272,9 @@ introsplit1:
 
 		lda #$32
 		sta $d012
-		lda #<introirq
+		lda #<irq
 		sta $fffe
-		lda #>introirq
+		lda #>irq
 		sta $ffff
 
 		pla
