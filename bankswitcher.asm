@@ -27,7 +27,7 @@ bankselect:
     rts
 
 loopdone:
-    inc bordercolor + 1
+    inc bordercolor
     rts
 
 bankValues:

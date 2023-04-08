@@ -3,7 +3,8 @@
 .fill music.size, music.getData(i)
 
 .import source "bankswitcher.asm"
-
+.var debug = false
+.var indicator = true
 
 .pc = $0801 "Program Start"
 :BasicUpstart($0900)
@@ -73,8 +74,13 @@ ddoo:
 
 		lda #$06
 		sta $d021
-     
-		lda #$00
+
+                ldy #$05
+                dey
+                bne * - 1
+                nop
+
+		lda #$0e
 		sta $d020
 
 		lda #$08
@@ -88,13 +94,22 @@ do18:
 		lda #$3b
 		sta $d011
 
-bordercolor:
-        lda #$06
-        sta $d020
 
-        inc $d020
+      //  lda #$06
+     //   sta $d020
+
+        .if (debug)
+        {
+                inc $d020
+        }
+
         jsr music.play
-        dec $d020
+
+        .if (debug)
+        {
+                dec $d020
+        }
+
 
 		lda #$ff
 		sta $d012
@@ -120,22 +135,49 @@ irq2:
 
 		lda #$ff
 		sta $d019
-		lda #$00
-		sta $d020
+		// lda #$00
+		// sta $d020
 
 		// lda #$14
 		// sta $d018
 		// lda #$08
 		// sta $d016
 
-        inc $d020
+        .if (debug)
+        {
+                inc $d020
+        }
+
         jsr bankswitcher
     //    jsr fadeout
-        dec $d020
+        
+        .if (debug)
+        {
+                dec $d020
+        }
 
-		lda #$02
-		sta $d020
+	//	lda #$02
+	//	sta $d020
+.if (indicator)
+    {
+        split1:
+        lda $d012
+        cmp #$08
+        bne split1
 
+
+        lda bordercolor
+        sta $d020
+
+        split2:
+        lda $d012
+        cmp #$18
+        bne split2
+
+        lda #$0e
+        sta $d020
+
+    }
 		dec iloop+1
 
 		lda #$2e
@@ -152,7 +194,8 @@ irq2:
 		pla
 		rti
 
-
+bordercolor:
+        .byte $00
 //-------------------STABILIZE CODE -----
 
 stabilize_raster:      
