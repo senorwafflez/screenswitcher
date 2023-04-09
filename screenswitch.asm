@@ -6,7 +6,7 @@
 .import source "introtexter.asm"
 
 .var debug = false
-.var indicator = true
+.var indicator = false
 
 .pc = $0801 "Program Start"
 :BasicUpstart($0900)
@@ -227,18 +227,6 @@ introirq:	pha
                 lda #%00000011
 		sta $dd00
 
-                ldy #$05
-                dey
-                bne * - 1
-                nop
-
-		lda #$0e
-		sta $d020
-                nop
-                bit $ea
-
-                lda #$06
-		sta $d021
 
 		lda #$08
 		sta $d016
